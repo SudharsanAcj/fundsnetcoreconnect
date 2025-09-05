@@ -23,7 +23,7 @@
 		<springdoc.version>2.5.0</springdoc.version>
 		<mapstruct.version>1.5.5.Final</mapstruct.version>
 		<lombok.version>1.18.32</lombok.version>
-		<openapi-generator.version>7.5.0</openapi-generator.version>
+		<openapi-generator.version>7.8.0</openapi-generator.version>
 		<jacoco.version>0.8.12</jacoco.version>
 	</properties>
 
@@ -79,6 +79,14 @@
 	</dependencies>
 
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>**/*.yaml</include>
+				</includes>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -89,12 +97,49 @@
 				<artifactId>openapi-generator-maven-plugin</artifactId>
 				<version>${openapi-generator.version}</version>
 				<executions>
+						 <execution>
+                        <id>investor-onboarding</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/api/api-spec-InvestorOnboarding.yaml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <apiPackage>com.cams.fundsnetcoreconnect.api</apiPackage>
+                            <modelPackage>com.cams.fundsnetcoreconnect.api.model</modelPackage>
+                            <configOptions>
+                                <useSpringBoot3>true</useSpringBoot3>
+                                <interfaceOnly>true</interfaceOnly>
+                                <useTags>true</useTags>
+                                <delegatePattern>false</delegatePattern>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+					 <execution>
+                        <id>financial-management</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/api/api-spec-FinancialManagement.yaml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <apiPackage>com.cams.fundsnetcoreconnect.api</apiPackage>
+                            <modelPackage>com.cams.fundsnetcoreconnect.api.model</modelPackage>
+                            <configOptions>
+                                <useSpringBoot3>true</useSpringBoot3>
+                                <interfaceOnly>true</interfaceOnly>
+                                <useTags>true</useTags>
+                                <delegatePattern>false</delegatePattern>
+                            </configOptions>
+                        </configuration>
+                    </execution>
 					<execution>
+						<id>download</id>
 						<goals>
 							<goal>generate</goal>
 						</goals>
 						<configuration>
-							<inputSpec>${project.basedir}/src/main/resources/api/api-spec-InvestorOnboarding.yaml</inputSpec>
+							<inputSpec>${project.basedir}/src/main/resources/api/api-spec-download.yaml</inputSpec>
 							<generatorName>spring</generatorName>
 							<apiPackage>com.cams.fundsnetcoreconnect.api</apiPackage>
 							<modelPackage>com.cams.fundsnetcoreconnect.api.model</modelPackage>
@@ -106,6 +151,60 @@
 							</configOptions>
 						</configuration>
 					</execution>
+					 <execution>
+                        <id>bookmarks</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/api/api-spec-bookmarks.yaml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <apiPackage>com.cams.fundsnetcoreconnect.api</apiPackage>
+                            <modelPackage>com.cams.fundsnetcoreconnect.api.model</modelPackage>
+                            <configOptions>
+                                <useSpringBoot3>true</useSpringBoot3>
+                                <interfaceOnly>true</interfaceOnly>
+                                <useTags>true</useTags>
+                                <delegatePattern>false</delegatePattern>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+						 <execution>
+                        <id>reports</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/api/api-spec-Reports.yaml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <apiPackage>com.cams.fundsnetcoreconnect.api</apiPackage>
+                            <modelPackage>com.cams.fundsnetcoreconnect.api.model</modelPackage>
+                            <configOptions>
+                                <useSpringBoot3>true</useSpringBoot3>
+                                <interfaceOnly>true</interfaceOnly>
+                                <useTags>true</useTags>
+                                <delegatePattern>false</delegatePattern>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+					<execution>
+                        <id>uploads</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/api/api-spec-Uploads.yaml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <apiPackage>com.cams.fundsnetcoreconnect.api</apiPackage>
+                            <modelPackage>com.cams.fundsnetcoreconnect.api.model</modelPackage>
+                            <configOptions>
+                                <useSpringBoot3>true</useSpringBoot3>
+                                <interfaceOnly>true</interfaceOnly>
+                                <useTags>true</useTags>
+                                <delegatePattern>false</delegatePattern>
+                            </configOptions>
+                        </configuration>
+                    </execution>
 				</executions>
 			</plugin>
 			<plugin>

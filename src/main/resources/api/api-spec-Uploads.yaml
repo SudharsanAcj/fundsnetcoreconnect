@@ -1,0 +1,130 @@
+  openapi: 3.0.3
+  info:
+    title: CAMS BFF API - Uploads
+    version: 1.0.0
+    description: Unified Backend-for-Frontend API for managing file upload endpoints, including generating presigned URLs for secure file uploads.
+  servers:
+    - url: http://localhost:8080/v1
+      description: Local development server
+    - url: https://api.camsbff.com/v1
+      description: Production server
+  components:
+    schemas:
+      UploadsErrorResponse:
+        type: object
+        description: Standard error response for the Uploads API.
+        properties:
+          status:
+            type: string
+            example: error
+            description: Status of the response, typically "error" for failed requests.
+          code:
+            type: string
+            example: '400'
+            description: HTTP status code or custom error code.
+          message:
+            type: string
+            example: Invalid request parameters
+            description: Human-readable error message.
+          details:
+            type: array
+            description: List of field-specific error details.
+            items:
+              type: object
+              properties:
+                field:
+                  type: string
+                  description: The field causing the error.
+                message:
+                  type: string
+                  description: Description of the error for the field.
+      Feed:
+        type: object
+        description: Represents metadata for a file upload feed.
+        properties:
+          feeds:
+            type: array
+            description: List of file metadata for the upload feed.
+            items:
+              $ref: '#/components/schemas/FeedMeta'
+          clientName:
+            type: string
+            description: Name of the client associated with the feed.
+          feedType:
+            type: string
+            enum: [aof, elog]
+            description: Type of feed, either 'aof' (Account Opening Form) or 'elog' (Electronic Log).
+          feedChecksum:
+            type: string
+            description: Checksum for validating the feed's integrity.
+      FeedMeta:
+        type: object
+        description: Metadata for an individual file in the upload feed.
+        properties:
+          fileName:
+            type: string
+            description: Name of the file.
+          fileType:
+            type: string
+            description: Type or format of the file (e.g., CSV, PDF).
+          fileSize:
+            type: number
+            description: Size of the file in bytes.
+      PreSignedUrl:
+        type: object
+        description: Response containing a presigned URL for file upload.
+        properties:
+          data:
+            type: object
+            description: Details of the presigned URL and associated metadata.
+            properties:
+              url:
+                type: string
+                example: https://storage.googleapis.com/...
+                description: Presigned URL for uploading the file.
+              expiry:
+                type: string
+                format: date-time
+                example: 2025-01-17T14:24:00Z
+                description: Expiry timestamp for the presigned URL.
+              fileMeta:
+                type: object
+                additionalProperties: true
+                description: Flexible metadata for the file (e.g., file name, type).
+      UploadsGetPreSignedUrlResponse:
+        type: object
+        description: Response for the presigned URL request, wrapping the PreSignedUrl schema.
+        properties:
+          status:
+            type: string
+            example: success
+            description: Status of the response, typically "success" for successful requests.
+          data:
+            $ref: '#/components/schemas/PreSignedUrl'
+            description: Presigned URL details for file upload.
+  paths:
+    /documents/preSignedUrl:
+      post:
+        summary: Get presigned URL for file upload
+        operationId: getPreSignedUrl
+        tags: [Uploads]
+        description: Generates a presigned URL for securely uploading files to a storage service.
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Feed'
+        responses:
+          '200':
+            description: Success
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/UploadsGetPreSignedUrlResponse'
+          '400':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/UploadsErrorResponse'

@@ -1,0 +1,177 @@
+openapi: 3.0.3
+info:
+  title: CAMS BFF API - Downloads
+  version: 1.0.0
+  description: Unified Backend-for-Frontend API for Downloads endpoints.
+servers:
+  - url: http://localhost:8080/v1
+    description: Local development server
+  - url: https://api.camsbff.com/v1
+    description: Production server
+components:
+  schemas:
+    DownloadsErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        code:
+          type: string
+          example: '400'
+        message:
+          type: string
+          example: Invalid request parameters
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+    DownloadsPagination:
+      type: object
+      properties:
+        page:
+          type: integer
+          example: 1
+        limit:
+          type: integer
+          example: 10
+        totalRecords:
+          type: integer
+          example: 200
+    DownloadsListDownloadsResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              fileReferenceId:
+                type: string
+                example: FR123456
+              fileName:
+                type: string
+                example: report.pdf
+              downloadTime:
+                type: string
+                format: date-time
+                example: 2025-01-17T14:24:00Z
+              downloadedBy:
+                type: string
+                example: User1
+        pagination:
+          $ref: '#/components/schemas/DownloadsPagination'
+    DownloadsViewDownloadDetailsResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: object
+          properties:
+            fileReferenceId:
+              type: string
+              example: FR123456
+            fileName:
+              type: string
+              example: report.pdf
+            downloadTime:
+              type: string
+              format: date-time
+              example: 2025-01-17T14:24:00Z
+            downloadedBy:
+              type: string
+              example: User1
+    DownloadsDownloadFileAgainResponse:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+paths:
+  /downloads:
+    get:
+      summary: List all downloads in the past 3 days
+      operationId: listDownloads
+      tags: [Downloads]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DownloadsListDownloadsResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DownloadsErrorResponse'
+  /downloads/{fileReferenceId}:
+    get:
+      summary: View downloaded file details
+      operationId: viewDownloadDetails
+      tags: [Downloads]
+      parameters:
+        - name: fileReferenceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DownloadsViewDownloadDetailsResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DownloadsErrorResponse'
+  /downloads/{fileReferenceId}/download:
+    get:
+      summary: Download file again
+      operationId: downloadFileAgain
+      tags: [Downloads]
+      parameters:
+        - name: fileReferenceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/octet-stream:
+              schema:
+                $ref: '#/components/schemas/DownloadsDownloadFileAgainResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DownloadsErrorResponse'

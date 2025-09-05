@@ -1,0 +1,180 @@
+openapi: 3.0.3
+info:
+  title: CAMS BFF API - Bookmarks
+  version: 1.0.0
+  description: Unified Backend-for-Frontend API for Bookmarks endpoints.
+servers:
+  - url: http://localhost:8080/v1
+    description: Local development server
+  - url: https://api.camsbff.com/v1
+    description: Production server
+components:
+  schemas:
+    BookmarksErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        code:
+          type: string
+          example: '400'
+        message:
+          type: string
+          example: Invalid request parameters
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+    BookmarksPagination:
+      type: object
+      properties:
+        page:
+          type: integer
+          example: 1
+        limit:
+          type: integer
+          example: 10
+        totalRecords:
+          type: integer
+          example: 200
+    BookmarksCreateBookmarkRequest:
+      type: object
+      properties:
+        referenceId:
+          type: string
+        type:
+          type: string
+          enum: [Report, Transaction]
+    BookmarksCreateBookmarkResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        message:
+          type: string
+          example: Bookmark created
+        bookmarkId:
+          type: string
+    BookmarksListBookmarksResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              bookmarkId:
+                type: string
+                example: BM123
+              referenceId:
+                type: string
+                example: RPT123456
+              type:
+                type: string
+                enum: [Report, Transaction]
+              createdBy:
+                type: string
+                example: User1
+              createdOn:
+                type: string
+                format: date-time
+                example: 2025-01-17T14:24:00Z
+        pagination:
+          $ref: '#/components/schemas/BookmarksPagination'
+    BookmarksDeleteBookmarkResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        message:
+          type: string
+          example: Bookmark deleted
+paths:
+  /bookmarks/create:
+    post:
+      summary: Create a bookmark
+      operationId: createBookmark
+      tags: [Bookmarks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookmarksCreateBookmarkRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookmarksCreateBookmarkResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookmarksErrorResponse'
+  /bookmarks:
+    get:
+      summary: List all bookmarks
+      operationId: listBookmarks
+      tags: [Bookmarks]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookmarksListBookmarksResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookmarksErrorResponse'
+  /bookmarks/{bookmarkId}:
+    delete:
+      summary: Delete a bookmark
+      operationId: deleteBookmark
+      tags: [Bookmarks]
+      parameters:
+        - name: bookmarkId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookmarksDeleteBookmarkResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookmarksErrorResponse'

@@ -56,7 +56,7 @@ public class DummyDataRepository {
         imageStatus.setParentReference(JsonNullable.of("76544523"));
         imageStatus.setUploadedBy("User1");
         imageStatus.setUploadTime(OffsetDateTime.parse("2025-01-17T14:24:00Z"));
-        imageStatus.setImageUploadStatus(InvestorOnboardingGetInvestorOnboardingImageStatusResponseDataInner.ImageUploadStatusEnum.INPROGRESS);
+        imageStatus.setImageUploadStatus(InvestorOnboardingGetInvestorOnboardingImageStatusResponseDataInner.ImageUploadStatusEnum.IN_PROGRESS);
         investorImageStatuses.add(imageStatus);
 
         InvestorOnboardingGetInvestorStatusResponseDataInner investorStatus = new InvestorOnboardingGetInvestorStatusResponseDataInner();
@@ -278,4 +278,50 @@ public class DummyDataRepository {
     public InvestorOnboardingUploadInvestorRemediationResponse uploadInvestorRemediation(String transactionReferenceId, String documentType, MultipartFile file) {
         return uploadResponses.get(0); // Return first mock response
     }
+    //for Downloads
+    private final List<DownloadsListDownloadsResponseDataInner> downloadRecords = new ArrayList<>();
+
+        {
+            // Initialize dummy data
+            DownloadsListDownloadsResponseDataInner record = new DownloadsListDownloadsResponseDataInner();
+            record.setFileReferenceId("FR123456");
+            record.setFileName("report.pdf");
+            record.setDownloadTime(OffsetDateTime.parse("2025-01-17T14:24:00Z"));
+            record.setDownloadedBy("User1");
+            downloadRecords.add(record);
+        }
+
+        public DownloadsDownloadFileAgainResponse downloadFileAgain (String fileReferenceId){
+        DownloadsDownloadFileAgainResponse response = new DownloadsDownloadFileAgainResponse();
+        response.setFile(new ByteArrayResource(new byte[0])); // Placeholder for binary data
+        return response;
+    }
+
+        public DownloadsListDownloadsResponse listDownloads (Integer page, Integer limit){
+        DownloadsListDownloadsResponse response = new DownloadsListDownloadsResponse();
+        response.setStatus("success");
+        response.setData(downloadRecords.subList(0, Math.min(limit, downloadRecords.size())));
+        DownloadsPagination pagination = new DownloadsPagination();
+        pagination.setPage(page);
+        pagination.setLimit(limit);
+        pagination.setTotalRecords(downloadRecords.size());
+        response.setPagination(pagination);
+        return response;
+    }
+
+        public DownloadsViewDownloadDetailsResponse viewDownloadDetails (String fileReferenceId){
+        DownloadsViewDownloadDetailsResponse response = new DownloadsViewDownloadDetailsResponse();
+        response.setStatus("success");
+        for (DownloadsListDownloadsResponseDataInner record : downloadRecords) {
+            if (record.getFileReferenceId().equals(fileReferenceId)) {
+                response.setData(record);
+                break;
+            }
+        }
+        if (response.getData() == null) {
+            response.setData(new DownloadsListDownloadsResponseDataInner()); // Default if not found
+        }
+        return response;
+    }
+
 }

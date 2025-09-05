@@ -1,0 +1,872 @@
+openapi: 3.0.3
+info:
+  title: CAMS BFF API - Financial Management
+  version: 1.0.0
+  description: Unified Backend-for-Frontend API for Financial Management endpoints.
+servers:
+  - url: http://localhost:8080/v1
+    description: Local development server
+  - url: https://api.camsbff.com/v1
+    description: Production server
+components:
+  schemas:
+    FinancialManagementErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        code:
+          type: string
+          example: '400'
+        message:
+          type: string
+          example: Invalid request parameters
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+    FinancialManagementPagination:
+      type: object
+      properties:
+        page:
+          type: integer
+          example: 1
+        limit:
+          type: integer
+          example: 10
+        totalRecords:
+          type: integer
+          example: 200
+    FinancialManagementGetFinancialSummaryResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: object
+          properties:
+            overall:
+              type: integer
+              example: 1000
+            success:
+              type: integer
+              example: 800
+            pending:
+              type: integer
+              example: 100
+            toBeRemediated:
+              type: integer
+              example: 50
+            failure:
+              type: integer
+              example: 50
+            clientBreakdowns:
+              type: array
+              items:
+                type: object
+                properties:
+                  clientName:
+                    type: string
+                  counts:
+                    $ref: '#/components/schemas/FinancialManagementStatusCount'
+    FinancialManagementStatusCount:
+      type: object
+      properties:
+        pending:
+          type: integer
+          example: 231
+        toBeRemediated:
+          type: integer
+          example: 0
+        failure:
+          type: integer
+          example: 0
+    FinancialManagementGetFinancialFileStatusResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              clientName:
+                type: string
+                example: HDFC
+                nullable: true
+              fileReference:
+                type: string
+                example: FR123456
+              fileName:
+                type: string
+                example: transactions.csv
+              uploadTime:
+                type: string
+                format: date-time
+                example: 2025-01-17T14:24:00Z
+              uploadedBy:
+                type: string
+                example: User1
+              fileUploadStatus:
+                type: string
+                enum: [InProgress, Completed, TemplateFailure, FileFailure]
+                example: Completed
+              totalTransactions:
+                type: integer
+                example: 100
+                nullable: true
+              statusCount:
+                $ref: '#/components/schemas/FinancialManagementStatusCount'
+              action:
+                type: string
+                enum: [download, view]
+                example: download
+        pagination:
+          $ref: '#/components/schemas/FinancialManagementPagination'
+    FinancialManagementDownloadFinancialFileStatusResponse:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+    FinancialManagementGetAllAMCsResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+                example: H
+              name:
+                type: string
+                example: HDFC AMC
+    FinancialManagementGetAllTransactionTypesResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+                example: H
+              name:
+                type: string
+                example: HDFC AMC
+    FinancialManagementSearchFinancialTransactionsRequest:
+      type: object
+      properties:
+        fileReference:
+          type: string
+          example: FR123456
+        amc:
+          type: string
+          example: H
+        transactionType:
+          type: string
+          example: Fresh Purchase
+        date:
+          type: string
+          format: date
+          example: '2025-01-17'
+        folioNumber:
+          type: string
+          example: '987942384'
+        pan:
+          type: string
+          example: DBXPG25374M
+        page:
+          type: integer
+          example: 1
+        limit:
+          type: integer
+          example: 10
+    FinancialManagementSearchFinancialTransactionsResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: object
+          properties:
+            summary:
+              type: object
+              properties:
+                pending:
+                  type: integer
+                  example: 100
+                transactionQueued:
+                  type: integer
+                  example: 50
+            transactions:
+              type: array
+              items:
+                $ref: '#/components/schemas/FinancialManagementGetFinancialTransactionStatusByIdResponse'
+        pagination:
+          $ref: '#/components/schemas/FinancialManagementPagination'
+    FinancialManagementGetFinancialTransactionStatusByIdResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: object
+          properties:
+            clientName:
+              type: string
+              nullable: true
+            userTransactionNumber:
+              type: string
+              example: '987654345'
+            folioNumber:
+              type: string
+              example: '987942384'
+            pan:
+              type: string
+              example: DBXPG25374M
+            amcCode:
+              type: string
+              example: H
+            schemeCode:
+              type: string
+              example: S1
+            transactionType:
+              type: string
+              example: Fresh Purchase
+            amount:
+              type: number
+              example: 1000
+            timestamp:
+              type: string
+              format: date-time
+              example: 2025-01-17T14:24:00Z
+            receivedOn:
+              type: string
+              format: date-time
+              example: 2025-01-17T14:24:00Z
+              nullable: true
+            status:
+              type: string
+              enum: [Pending, Completed, Rejected, ToBeRemediation]
+              example: Pending
+            errorCode:
+              type: string
+              example: '64637'
+              nullable: true
+            errorDescription:
+              type: string
+              example: Invalid folio number
+              nullable: true
+            assignedTo:
+              type: string
+              example: BO_User1
+              nullable: true
+            arn:
+              type: string
+              example: ARN12345
+              nullable: true
+            remarks:
+              type: string
+              example: Awaiting approval
+              nullable: true
+            uploadDetails:
+              type: object
+              additionalProperties: true
+              nullable: true
+            schemeDetails:
+              type: object
+              additionalProperties: true
+              nullable: true
+            errorRemarks:
+              type: object
+              additionalProperties: true
+              nullable: true
+    FinancialManagementGetBOTransactionSummaryResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: object
+          properties:
+            pending:
+              type: integer
+            transactionQueued:
+              type: integer
+    FinancialManagementGetFinancialGroupedByErrorCodeResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              clientName:
+                type: string
+                nullable: true
+              errorCode:
+                type: string
+                example: '64637'
+              errorDescription:
+                type: string
+                example: Invalid folio number
+              errorCount:
+                type: integer
+                example: 10
+              assignedTo:
+                type: string
+                example: BO_User1
+                nullable: true
+              actionRemarks:
+                type: string
+                example: Requires manual review
+                nullable: true
+        pagination:
+          $ref: '#/components/schemas/FinancialManagementPagination'
+    FinancialManagementGetFinancialAllTransactionsResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FinancialManagementGetFinancialTransactionStatusByIdResponse'
+        pagination:
+          $ref: '#/components/schemas/FinancialManagementPagination'
+    FinancialManagementSendToQueueByErrorCodeResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        message:
+          type: string
+          example: Transactions sent to queue
+    FinancialManagementSendToQueueByErrorCodeBulkRequest:
+      type: object
+      properties:
+        errorCodes:
+          type: array
+          items:
+            type: string
+    FinancialManagementSendToQueueByErrorCodeBulkResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        message:
+          type: string
+          example: Transactions sent to queue
+    FinancialManagementSendToQueueByTransactionIdResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        message:
+          type: string
+          example: Transactions sent to queue
+    FinancialManagementSendToQueueByTransactionIdBulkRequest:
+      type: object
+      properties:
+        transactionIds:
+          type: array
+          items:
+            type: string
+    FinancialManagementSendToQueueByTransactionIdBulkResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        message:
+          type: string
+          example: Transactions sent to queue
+    FinancialManagementAssignTransactionRequest:
+      type: object
+      properties:
+        transactionIds:
+          type: array
+          items:
+            type: string
+        assignedTo:
+          type: string
+          example: BO_User1
+    FinancialManagementAssignTransactionResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        message:
+          type: string
+          example: Transactions assigned successfully
+paths:
+  /financialTransactions/summary:
+    get:
+      summary: Get financial transaction summary
+      operationId: getFinancialSummary
+      tags: [Financial Management]
+      parameters:
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: view
+          in: query
+          schema:
+            type: string
+            enum: [client, non-client]
+            default: client
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialManagementGetFinancialSummaryResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialManagementErrorResponse'
+  /financialTransactions/fileStatus:
+    get:
+      summary: Get financial file status grid
+      operationId: getFinancialFileStatus
+      tags: [Financial Management]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: view
+          in: query
+          schema:
+            type: string
+            enum: [client, non-client]
+            default: client
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialManagementGetFinancialFileStatusResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialManagementErrorResponse'
+  /financialTransactions/fileStatus/{fileReferenceId}/download:
+    get:
+      summary: Download financial file
+      operationId: downloadFinancialFileStatus
+      tags: [Financial Management]
+      parameters:
+        - name: fileReferenceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/octet-stream:
+              schema:
+                $ref: '#/components/schemas/FinancialManagementDownloadFinancialFileStatusResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialManagementErrorResponse'
+  /financialTransactions/transactionStatus/allAMCs:
+    get:
+      summary: Get all AMCs for dropdown
+      operationId: getAllAMCs
+      tags: [Financial Management]
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialManagementGetAllAMCsResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialManagementErrorResponse'
+  /financialTransactions/transactionStatus/allTransactionTypes:
+    get:
+      summary: Get all transaction types for dropdown
+      operationId: getAllTransactionTypes
+      tags: [Financial Management]
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialManagementGetAllTransactionTypesResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialManagementErrorResponse'
+  /financialTransactions/transactionStatus:
+    post:
+      summary: Search financial transactions and get status summary
+      operationId: searchFinancialTransactions
+      tags: [Financial Management]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinancialManagementSearchFinancialTransactionsRequest'
+      parameters:
+        - name: view
+          in: query
+          schema:
+            type: string
+            enum: [client, non-client]
+            default: client
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialManagementSearchFinancialTransactionsResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialManagementErrorResponse'
+  /financialTransactions/transactionStatus/{userTransactionReferenceId}:
+    get:
+      summary: Get detailed transaction status
+      operationId: getFinancialTransactionStatusById
+      tags: [Financial Management]
+      parameters:
+        - name: userTransactionReferenceId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: view
+          in: query
+          schema:
+            type: string
+            enum: [client, non-client]
+            default: client
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialManagementGetFinancialTransactionStatusByIdResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialManagementErrorResponse'
+  /financialTransactions/transactionSummary:
+    get:
+      summary: Get BO User transaction status counts
+      operationId: getBOTransactionSummary
+      tags: [Financial Management]
+      parameters:
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialManagementGetBOTransactionSummaryResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialManagementErrorResponse'
+  /financialTransactions/groupedByErrorCode:
+    get:
+      summary: Get error-wise transactions for BO User
+      operationId: getFinancialGroupedByErrorCode
+      tags: [Financial Management]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialManagementGetFinancialGroupedByErrorCodeResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialManagementErrorResponse'
+  /financialTransactions/allTransactions:
+    get:
+      summary: Get transaction-wise details for BO User
+      operationId: getFinancialAllTransactions
+      tags: [Financial Management]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: view
+          in: query
+          schema:
+            type: string
+            enum: [client, non-client]
+            default: client
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialManagementGetFinancialAllTransactionsResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialManagementErrorResponse'
+  /financialTransactions/sendToQueueByErrorCode/{errorCode}:
+    post:
+      summary: Send transactions grouped by error code to queue
+      operationId: sendToQueueByErrorCode
+      tags: [Financial Management]
+      parameters:
+        - name: errorCode
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialManagementSendToQueueByErrorCodeResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialManagementErrorResponse'
+  /financialTransactions/sendToQueueByErrorCode/bulk:
+    post:
+      summary: Send transactions grouped by error code to queue in bulk
+      operationId: sendToQueueByErrorCodeBulk
+      tags: [Financial Management]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinancialManagementSendToQueueByErrorCodeBulkRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialManagementSendToQueueByErrorCodeBulkResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialManagementErrorResponse'
+  /financialTransactions/sendToQueueByTransactionId/{transactionReferenceId}:
+    post:
+      summary: Send transaction to queue
+      operationId: sendToQueueByTransactionId
+      tags: [Financial Management]
+      parameters:
+        - name: transactionReferenceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialManagementSendToQueueByTransactionIdResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialManagementErrorResponse'
+  /financialTransactions/sendToQueueByTransactionId/{transactionReferenceId}/bulk:
+    post:
+      summary: Send selected transactions to queue in bulk
+      operationId: sendToQueueByTransactionIdBulk
+      tags: [Financial Management]
+      parameters:
+        - name: transactionReferenceId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinancialManagementSendToQueueByTransactionIdBulkRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialManagementSendToQueueByTransactionIdBulkResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialManagementErrorResponse'
+  /financialTransactions/assignTransaction:
+    post:
+      summary: Assign transactions to a user
+      operationId: assignTransaction
+      tags: [Financial Management]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinancialManagementAssignTransactionRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialManagementAssignTransactionResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialManagementErrorResponse'

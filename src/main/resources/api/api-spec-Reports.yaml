@@ -1,0 +1,588 @@
+openapi: 3.0.3
+info:
+  title: CAMS BFF API - Reports
+  version: 1.0.0
+  description: Unified Backend-for-Frontend API for Reports endpoints.
+servers:
+  - url: http://localhost:8080/v1
+    description: Local development server
+  - url: https://api.camsbff.com/v1
+    description: Production server
+components:
+  schemas:
+    ReportsErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        code:
+          type: string
+          example: '400'
+        message:
+          type: string
+          example: Invalid request parameters
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+    ReportsPagination:
+      type: object
+      properties:
+        page:
+          type: integer
+          example: 1
+        limit:
+          type: integer
+          example: 10
+        totalRecords:
+          type: integer
+          example: 200
+    ReportsGetGeneratedReportsResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              reportId:
+                type: string
+                example: RPT123456
+              reportName:
+                type: string
+                example: All Transactions Report
+              reportType:
+                type: string
+                example: Financial transaction
+              reportConfig:
+                type: string
+                example: Daily - 15:00
+              frequency:
+                type: string
+                example: 01 Jan 2025 - 30 Jan 2025
+              generatedOn:
+                type: string
+                format: date-time
+                example: 2025-01-17T14:24:00Z
+              generatedBy:
+                type: string
+                example: Preethi
+              reportStatus:
+                type: string
+                enum: [InProgress, Completed]
+                example: Completed
+        pagination:
+          $ref: '#/components/schemas/ReportsPagination'
+    ReportsDownloadReportResponse:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+    ReportsShareReportRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+          example: santhoshkrishnamoorthy@hdfc.com
+    ReportsShareReportResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        message:
+          type: string
+          example: Report sent successfully to santhoshkrishnamoorthy@hdfc.com
+        reportLink:
+          type: string
+          format: uri
+          example: https://reports.hdfc.com/download/RPT123456
+    ReportsModifyReportRequest:
+      type: object
+      required:
+        - reportType
+        - transactionType
+      properties:
+        reportType:
+          type: string
+          enum: [Financial transaction, Non-financial transaction]
+          example: Financial transaction
+        transactionType:
+          type: string
+          example: Purchase
+        uploadDateFrom:
+          type: string
+          format: date
+          example: 2025-01-01
+        uploadDateTo:
+          type: string
+          format: date
+          example: 2025-01-31
+        userCode:
+          type: string
+          example: USER123
+        brokerCode:
+          type: string
+          example: BROKER456
+    ReportsModifyReportResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        message:
+          type: string
+          example: Changes have been applied successfully
+        updatedReportId:
+          type: string
+          example: RPT123456
+    ReportsDisableScheduledReportRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum: [Enabled, Disabled]
+          example: Disabled
+    ReportsDisableScheduledReportResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        message:
+          type: string
+          example: Report status updated successfully
+    ReportsDeleteScheduledReportResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        message:
+          type: string
+          example: Report deleted
+    ReportsGetAllReportTypesResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+                example: H
+              name:
+                type: string
+                example: HDFC AMC
+    ReportsGetReportTransactionTypesResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+                example: H
+              name:
+                type: string
+                example: HDFC AMC
+    ReportsGetAllSchedulesResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: array
+          items:
+            type: string
+            enum: [Daily, Weekly, Monthly]
+    ReportsCreateAdhocReportRequest:
+      type: object
+      required:
+        - reportType
+        - transactionType
+        - uploadDateFrom
+        - uploadDateTo
+      properties:
+        reportType:
+          type: string
+          enum: [Financial transaction, Non-financial transaction]
+          example: Financial transaction
+        transactionType:
+          type: string
+          example: Purchase
+        uploadDateFrom:
+          type: string
+          format: date
+          example: 2025-01-01
+        uploadDateTo:
+          type: string
+          format: date
+          example: 2025-01-30
+        userCode:
+          type: string
+          example: USER123
+        brokerCode:
+          type: string
+          example: BROKER456
+    ReportsCreateAdhocReportResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        message:
+          type: string
+          example: Adhoc report generated
+        reportId:
+          type: string
+          example: RPT20250901
+        downloadLink:
+          type: string
+          format: uri
+          example: https://reports.hdfc.com/download/RPT20250901
+    ReportsCreateScheduledReportRequest:
+      type: object
+      required:
+        - reportName
+        - reportType
+        - transactionType
+        - frequency
+      properties:
+        reportName:
+          type: string
+          example: Monthly Purchase Report
+        reportType:
+          type: string
+          enum: [Financial transaction, Non-financial transaction]
+          example: Financial transaction
+        transactionType:
+          type: string
+          example: Purchase
+        frequency:
+          type: string
+          enum: [Daily, Weekly, Monthly]
+          example: Weekly
+        userCode:
+          type: string
+          example: USER123
+        brokerCode:
+          type: string
+          example: BROKER456
+    ReportsCreateScheduledReportResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        message:
+          type: string
+          example: Scheduled report has been saved
+        reportId:
+          type: string
+          example: SCHED20250901
+paths:
+  /financialTransactions/reports:
+    get:
+      summary: Retrieve list of generated reports
+      operationId: getGeneratedReports
+      tags: [Reports]
+      parameters:
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportsGetGeneratedReportsResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportsErrorResponse'
+  /financialTransactions/reports/{reportId}/download:
+    get:
+      summary: Download generated report file
+      operationId: downloadReport
+      tags: [Reports]
+      parameters:
+        - name: reportId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/octet-stream:
+              schema:
+                $ref: '#/components/schemas/ReportsDownloadReportResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportsErrorResponse'
+  /financialTransactions/reports/{reportId}/share:
+    post:
+      summary: Share report to an email address
+      operationId: shareReport
+      tags: [Reports]
+      parameters:
+        - name: reportId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportsShareReportRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportsShareReportResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportsErrorResponse'
+  /financialTransactions/reports/manage/modify/{reportId}:
+    patch:
+      summary: Modify a report configuration
+      operationId: modifyReport
+      tags: [Reports]
+      parameters:
+        - name: reportId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportsModifyReportRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportsModifyReportResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportsErrorResponse'
+  /financialTransactions/reports/manage/disable/{reportId}:
+    patch:
+      summary: Disable a scheduled report
+      operationId: disableScheduledReport
+      tags: [Reports]
+      parameters:
+        - name: reportId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportsDisableScheduledReportRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportsDisableScheduledReportResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportsErrorResponse'
+  /financialTransactions/reports/manage/{reportId}:
+    delete:
+      summary: Delete a scheduled report
+      operationId: deleteScheduledReport
+      tags: [Reports]
+      parameters:
+        - name: reportId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportsDeleteScheduledReportResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportsErrorResponse'
+  /financialTransactions/reports/allReportTypes:
+    get:
+      summary: Get all report types
+      operationId: getAllReportTypes
+      tags: [Reports]
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportsGetAllReportTypesResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportsErrorResponse'
+  /financialTransactions/reports/allTransactionTypes:
+    get:
+      summary: Get all transaction types for reports
+      operationId: getReportTransactionTypes
+      tags: [Reports]
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportsGetReportTransactionTypesResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportsErrorResponse'
+  /financialTransactions/reports/allSchedules:
+    get:
+      summary: Get all schedules for reports
+      operationId: getAllSchedules
+      tags: [Reports]
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportsGetAllSchedulesResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportsErrorResponse'
+  /financialTransactions/reports/create/adhoc:
+    post:
+      summary: Create an adhoc report
+      operationId: createAdhocReport
+      tags: [Reports]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportsCreateAdhocReportRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportsCreateAdhocReportResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportsErrorResponse'
+  /financialTransactions/reports/create/scheduled:
+    post:
+      summary: Create a scheduled report
+      operationId: createScheduledReport
+      tags: [Reports]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportsCreateScheduledReportRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportsCreateScheduledReportResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportsErrorResponse'
