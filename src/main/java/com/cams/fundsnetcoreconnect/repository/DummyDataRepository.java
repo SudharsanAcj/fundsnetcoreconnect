@@ -469,4 +469,46 @@ public class DummyDataRepository {
         return response;
     }
 
+    //forBookMarks
+
+    private final List<BookmarksListBookmarksResponseDataInner> bookmarks = new ArrayList<>();
+
+    {
+        // Initialize dummy data
+        BookmarksListBookmarksResponseDataInner bookmark = new BookmarksListBookmarksResponseDataInner();
+        bookmark.setBookmarkId("BM123");
+        bookmark.setReferenceId("RPT123456");
+        bookmark.setType(BookmarksListBookmarksResponseDataInner.TypeEnum.REPORT);
+        bookmark.setCreatedBy("User1");
+        bookmark.setCreatedOn(OffsetDateTime.parse("2025-01-17T14:24:00Z"));
+        bookmarks.add(bookmark);
+    }
+
+    public BookmarksCreateBookmarkResponse createBookmark(BookmarksCreateBookmarkRequest request) {
+        BookmarksCreateBookmarkResponse response = new BookmarksCreateBookmarkResponse();
+        response.setStatus("success");
+        response.setMessage("Bookmark created");
+        response.setBookmarkId("BM" + System.currentTimeMillis()); // Unique ID based on timestamp
+        return response;
+    }
+
+    public BookmarksDeleteBookmarkResponse deleteBookmark(String bookmarkId) {
+        BookmarksDeleteBookmarkResponse response = new BookmarksDeleteBookmarkResponse();
+        response.setStatus("success");
+        response.setMessage("Bookmark deleted");
+        return response;
+    }
+
+    public BookmarksListBookmarksResponse listBookmarks(Integer page, Integer limit) {
+        BookmarksListBookmarksResponse response = new BookmarksListBookmarksResponse();
+        response.setStatus("success");
+        response.setData(bookmarks.subList(0, Math.min(limit, bookmarks.size())));
+        BookmarksPagination pagination = new BookmarksPagination();
+        pagination.setPage(page);
+        pagination.setLimit(limit);
+        pagination.setTotalRecords(bookmarks.size());
+        response.setPagination(pagination);
+        return response;
+    }
+
 }
