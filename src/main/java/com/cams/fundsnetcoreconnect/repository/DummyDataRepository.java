@@ -9,7 +9,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class DummyDataRepository {
@@ -434,6 +436,36 @@ public class DummyDataRepository {
         response.setStatus("success");
         response.setMessage("Report sent successfully to " + request.getEmail());
         response.setReportLink(URI.create("https://reports.hdfc.com/download/" + reportId));
+        return response;
+    }
+
+    //for uploads
+
+    public UploadsGetPreSignedUrlResponse getPreSignedUrl(Feed feed) {
+        UploadsGetPreSignedUrlResponse response = new UploadsGetPreSignedUrlResponse();
+        response.setStatus("success");
+
+        PreSignedUrl preSignedUrl = new PreSignedUrl();
+        PreSignedUrlData data = new PreSignedUrlData();
+        data.setUrl("https://storage.googleapis.com/uploaded-file-123");
+        data.setExpiry(OffsetDateTime.now().plusHours(1)); // Expires in 1 hour
+
+        Map<String, Object> fileMeta = new HashMap<>();
+        if (feed.getFeeds() != null && !feed.getFeeds().isEmpty()) {
+            FeedMeta meta = feed.getFeeds().get(0);
+            fileMeta.put("fileName", meta.getFileName());
+            fileMeta.put("fileType", meta.getFileType());
+            fileMeta.put("fileSize", meta.getFileSize());
+        } else {
+            fileMeta.put("fileName", "default.pdf");
+            fileMeta.put("fileType", "pdf");
+            fileMeta.put("fileSize", new java.math.BigDecimal("1024"));
+        }
+        data.setFileMeta(fileMeta);
+
+        preSignedUrl.setData(data);
+        response.setData(preSignedUrl);
+
         return response;
     }
 
