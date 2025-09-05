@@ -6,6 +6,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -321,6 +322,118 @@ public class DummyDataRepository {
         if (response.getData() == null) {
             response.setData(new DownloadsListDownloadsResponseDataInner()); // Default if not found
         }
+        return response;
+    }
+
+    //for reports
+    private final List<ReportsGetGeneratedReportsResponseDataInner> generatedReports = new ArrayList<>();
+    private final List<ReportsGetAllReportTypesResponseDataInner> reportTypes = new ArrayList<>();
+
+    {
+        // Initialize dummy data for generated reports
+        ReportsGetGeneratedReportsResponseDataInner report = new ReportsGetGeneratedReportsResponseDataInner();
+        report.setReportId("RPT123456");
+        report.setReportName("All Transactions Report");
+        report.setReportType("Financial transaction");
+        report.setReportConfig("Daily - 15:00");
+        report.setFrequency("01 Jan 2025 - 30 Jan 2025");
+        report.setGeneratedOn(OffsetDateTime.parse("2025-01-17T14:24:00Z"));
+        report.setGeneratedBy("Preethi");
+        report.setReportStatus(ReportsGetGeneratedReportsResponseDataInner.ReportStatusEnum.COMPLETED);
+        generatedReports.add(report);
+
+        // Initialize dummy data for report types
+        ReportsGetAllReportTypesResponseDataInner reportType = new ReportsGetAllReportTypesResponseDataInner();
+        reportType.setCode("H");
+        reportType.setName("HDFC AMC");
+        reportTypes.add(reportType);
+    }
+
+    public ReportsCreateAdhocReportResponse createAdhocReport(ReportsCreateAdhocReportRequest request) {
+        ReportsCreateAdhocReportResponse response = new ReportsCreateAdhocReportResponse();
+        response.setStatus("success");
+        response.setMessage("Adhoc report generated");
+        response.setReportId("RPT20250901");
+        response.setDownloadLink(URI.create("https://reports.hdfc.com/download/RPT20250901"));
+        return response;
+    }
+
+    public ReportsCreateScheduledReportResponse createScheduledReport(ReportsCreateScheduledReportRequest request) {
+        ReportsCreateScheduledReportResponse response = new ReportsCreateScheduledReportResponse();
+        response.setStatus("success");
+        response.setMessage("Scheduled report has been saved");
+        response.setReportId("SCHED20250901");
+        return response;
+    }
+
+    public ReportsDeleteScheduledReportResponse deleteScheduledReport(String reportId) {
+        ReportsDeleteScheduledReportResponse response = new ReportsDeleteScheduledReportResponse();
+        response.setStatus("success");
+        response.setMessage("Report deleted");
+        return response;
+    }
+
+    public ReportsDisableScheduledReportResponse disableScheduledReport(String reportId, ReportsDisableScheduledReportRequest request) {
+        ReportsDisableScheduledReportResponse response = new ReportsDisableScheduledReportResponse();
+        response.setStatus("success");
+        response.setMessage("Report status updated successfully");
+        return response;
+    }
+
+    public ReportsDownloadReportResponse downloadReport(String reportId) {
+        ReportsDownloadReportResponse response = new ReportsDownloadReportResponse();
+        response.setFile(new ByteArrayResource(new byte[0])); // Placeholder for binary data
+        return response;
+    }
+
+    public ReportsGetAllReportTypesResponse getAllReportTypes() {
+        ReportsGetAllReportTypesResponse response = new ReportsGetAllReportTypesResponse();
+        response.setStatus("success");
+        response.setData(reportTypes);
+        return response;
+    }
+
+    public ReportsGetAllSchedulesResponse getAllSchedules() {
+        ReportsGetAllSchedulesResponse response = new ReportsGetAllSchedulesResponse();
+        response.setStatus("success");
+        response.addDataItem(ReportsGetAllSchedulesResponse.DataEnum.DAILY);
+        response.addDataItem(ReportsGetAllSchedulesResponse.DataEnum.WEEKLY);
+        response.addDataItem(ReportsGetAllSchedulesResponse.DataEnum.MONTHLY);
+        return response;
+    }
+
+    public ReportsGetGeneratedReportsResponse getGeneratedReports(Integer page, Integer limit) {
+        ReportsGetGeneratedReportsResponse response = new ReportsGetGeneratedReportsResponse();
+        response.setStatus("success");
+        response.setData(generatedReports.subList(0, Math.min(limit, generatedReports.size())));
+        ReportsPagination pagination = new ReportsPagination();
+        pagination.setPage(page);
+        pagination.setLimit(limit);
+        pagination.setTotalRecords(generatedReports.size());
+        response.setPagination(pagination);
+        return response;
+    }
+
+    public ReportsGetReportTransactionTypesResponse getReportTransactionTypes() {
+        ReportsGetReportTransactionTypesResponse response = new ReportsGetReportTransactionTypesResponse();
+        response.setStatus("success");
+        response.setData(reportTypes);
+        return response;
+    }
+
+    public ReportsModifyReportResponse modifyReport(String reportId, ReportsModifyReportRequest request) {
+        ReportsModifyReportResponse response = new ReportsModifyReportResponse();
+        response.setStatus("success");
+        response.setMessage("Changes have been applied successfully");
+        response.setUpdatedReportId("RPT123456");
+        return response;
+    }
+
+    public ReportsShareReportResponse shareReport(String reportId, ReportsShareReportRequest request) {
+        ReportsShareReportResponse response = new ReportsShareReportResponse();
+        response.setStatus("success");
+        response.setMessage("Report sent successfully to " + request.getEmail());
+        response.setReportLink(URI.create("https://reports.hdfc.com/download/" + reportId));
         return response;
     }
 
