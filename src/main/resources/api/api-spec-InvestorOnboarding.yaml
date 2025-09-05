@@ -1,0 +1,1004 @@
+openapi: 3.0.3
+info:
+  title: CAMS BFF API - Investor Onboarding
+  version: 1.0.0
+  description: Unified Backend-for-Frontend API for Investor Onboarding endpoints.
+servers:
+  - url: http://localhost:8080/v1
+    description: Local development server
+  - url: https://api.camsbff.com/v1
+    description: Production server
+components:
+  schemas:
+    InvestorOnboardingErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        code:
+          type: string
+          example: '400'
+        message:
+          type: string
+          example: Invalid request parameters
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+    InvestorOnboardingPagination:
+      type: object
+      properties:
+        page:
+          type: integer
+          example: 1
+        limit:
+          type: integer
+          example: 10
+        totalRecords:
+          type: integer
+          example: 200
+    InvestorOnboardingGetInvestorOnboardingSummaryResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: object
+          properties:
+            overall:
+              type: integer
+              example: 1000
+            success:
+              type: integer
+              example: 800
+            pending:
+              type: integer
+              example: 100
+            toBeRemediated:
+              type: integer
+              example: 50
+            failure:
+              type: integer
+              example: 50
+    InvestorOnboardingStatusCount:
+      type: object
+      properties:
+        pending:
+          type: integer
+          example: 231
+        toBeRemediated:
+          type: integer
+          example: 0
+        failure:
+          type: integer
+          example: 0
+    InvestorOnboardingGetInvestorOnboardingFileStatusResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              clientName:
+                type: string
+                example: HDFC
+                nullable: true
+              fileReference:
+                type: string
+                example: FR123456
+              fileName:
+                type: string
+                example: transactions.csv
+              onboardingType:
+                type: string
+                example: KYC
+                nullable: true
+              uploadTime:
+                type: string
+                format: date-time
+                example: 2025-01-17T14:24:00Z
+              uploadedBy:
+                type: string
+                example: User1
+              fileUploadStatus:
+                type: string
+                enum: [InProgress, Completed, TemplateFailure, FileFailure]
+                example: Completed
+              totalTransactions:
+                type: integer
+                example: 100
+                nullable: true
+              statusCount:
+                $ref: '#/components/schemas/InvestorOnboardingStatusCount'
+        pagination:
+          $ref: '#/components/schemas/InvestorOnboardingPagination'
+    InvestorOnboardingDownloadInvestorOnboardingFileStatusResponse:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+    InvestorOnboardingGetInvestorOnboardingImageStatusResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              reference:
+                type: string
+                example: '45678965432'
+              clientName:
+                type: string
+                nullable: true
+              fileName:
+                type: string
+                example: Image_name_1.zip
+              parentReference:
+                type: string
+                nullable: true
+                example: '76544523'
+              uploadedBy:
+                type: string
+                example: User1
+              uploadTime:
+                type: string
+                format: date-time
+                example: 2025-01-17T14:24:00Z
+              imageUploadStatus:
+                type: string
+                enum: [InProgress, Completed, Failed]
+                example: InProgress
+        pagination:
+          $ref: '#/components/schemas/InvestorOnboardingPagination'
+    InvestorOnboardingGetInvestorStatusResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              clientName:
+                type: string
+                nullable: true
+              reference:
+                type: string
+                example: TRX123456
+              fileReference:
+                type: string
+                example: FR123456
+              investorPan:
+                type: string
+                example: DBXPG25374M
+              investorName:
+                type: string
+                example: John Doe
+              arn:
+                type: string
+                example: ARN12345
+              uploadedBy:
+                type: string
+                example: User1
+              uploadTime:
+                type: string
+                format: date-time
+                example: 2025-01-17T14:24:00Z
+              status:
+                type: string
+                enum: [Pending, Completed, Rejected, ToBeRemediation]
+                example: Pending
+              remarks:
+                type: string
+                example: Awaiting approval
+                nullable: true
+        pagination:
+          $ref: '#/components/schemas/InvestorOnboardingPagination'
+    InvestorOnboardingDownloadInvestorStatusResponse:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+    InvestorOnboardingGetInvestorRemediationResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: object
+          properties:
+            reference:
+              type: string
+              example: TRX123456
+            investorPan:
+              type: string
+              example: DBXPG25374M
+            investorName:
+              type: string
+              example: John Doe
+            arn:
+              type: string
+              example: ARN12345
+            status:
+              type: string
+              enum: [Pending, Completed, Rejected, ToBeRemediation]
+              example: Pending
+            remarks:
+              type: string
+              example: Awaiting approval
+              nullable: true
+    InvestorOnboardingUpdateInvestorRemediationRequest:
+      type: object
+      properties:
+        updates:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              newValue:
+                type: string
+    InvestorOnboardingUpdateInvestorRemediationResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        message:
+          type: string
+          example: Updates applied successfully
+    InvestorOnboardingUploadInvestorRemediationRequest:
+      type: object
+      properties:
+        documentType:
+          type: string
+          example: Aadhaar card
+        file:
+          type: string
+          format: binary
+    InvestorOnboardingUploadInvestorRemediationResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        message:
+          type: string
+          example: Updates applied successfully
+    InvestorOnboardingGetInvestorOnboardingAuthorizeResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: object
+          properties:
+            reference:
+              type: string
+              example: TRX123456
+            investorPan:
+              type: string
+              example: DBXPG25374M
+            investorName:
+              type: string
+              example: John Doe
+            arn:
+              type: string
+              example: ARN12345
+            status:
+              type: string
+              enum: [Pending, Completed, Rejected, ToBeRemediation]
+              example: Pending
+            remarks:
+              type: string
+              example: Awaiting approval
+              nullable: true
+    InvestorOnboardingGetAuthorizeSectionViewResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: object
+          additionalProperties: true
+    InvestorOnboardingGetAuthorizeAOFResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: object
+          properties:
+            documentType:
+              type: string
+              example: AOF
+            url:
+              type: string
+              example: https://storage.googleapis.com/doc123
+            metadata:
+              type: object
+              additionalProperties: true
+    InvestorOnboardingGetAuthorizePANResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: object
+          properties:
+            documentType:
+              type: string
+              example: PAN
+            url:
+              type: string
+              example: https://storage.googleapis.com/doc123
+            metadata:
+              type: object
+              additionalProperties: true
+    InvestorOnboardingGetAuthorizeRequiredDocumentsResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: array
+          items:
+            type: string
+            example: Aadhaar card
+    InvestorOnboardingGetAuthorizeInvestorDetailsResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: object
+          properties:
+            reference:
+              type: string
+              example: TRX123456
+            investorPan:
+              type: string
+              example: DBXPG25374M
+            investorName:
+              type: string
+              example: John Doe
+            arn:
+              type: string
+              example: ARN12345
+            status:
+              type: string
+              enum: [Pending, Completed, Rejected, ToBeRemediation]
+              example: Pending
+            remarks:
+              type: string
+              example: Awaiting approval
+              nullable: true
+    InvestorOnboardingGetAuthorizeInvestorSignatureResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: object
+          properties:
+            documentType:
+              type: string
+              example: Signature
+            url:
+              type: string
+              example: https://storage.googleapis.com/doc123
+            metadata:
+              type: object
+              additionalProperties: true
+    InvestorOnboardingRejectInvestorOnboardingAuthorizeRequest:
+      type: object
+    InvestorOnboardingRejectInvestorOnboardingAuthorizeResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        message:
+          type: string
+          example: Action performed
+    InvestorOnboardingSendToRemediateInvestorOnboardingAuthorizeRequest:
+      type: object
+    InvestorOnboardingSendToRemediateInvestorOnboardingAuthorizeResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        message:
+          type: string
+          example: Action performed
+    InvestorOnboardingSubmitInvestorOnboardingAuthorizeRequest:
+      type: object
+      properties:
+        action:
+          type: string
+          enum: [Submit]
+          example: Submit
+    InvestorOnboardingSubmitInvestorOnboardingAuthorizeResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: object
+          properties:
+            reference:
+              type: string
+              example: TRX123456
+            investorPan:
+              type: string
+              example: DBXPG25374M
+            investorName:
+              type: string
+              example: John Doe
+            arn:
+              type: string
+              example: ARN12345
+            status:
+              type: string
+              enum: [Pending, Completed, Rejected, ToBeRemediation]
+              example: Pending
+            remarks:
+              type: string
+              example: Awaiting approval
+              nullable: true
+paths:
+  /investorOnboarding/summary:
+    get:
+      summary: Get investor onboarding summary
+      operationId: getInvestorOnboardingSummary
+      tags: [Investor Onboarding]
+      parameters:
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingGetInvestorOnboardingSummaryResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingErrorResponse'
+  /investorOnboarding/fileStatus:
+    get:
+      summary: Get investor onboarding file status
+      operationId: getInvestorOnboardingFileStatus
+      tags: [Investor Onboarding]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingGetInvestorOnboardingFileStatusResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingErrorResponse'
+  /investorOnboarding/fileStatus/{fileReferenceId}/download:
+    get:
+      summary: Download investor onboarding file
+      operationId: downloadInvestorOnboardingFileStatus
+      tags: [Investor Onboarding]
+      parameters:
+        - name: fileReferenceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/octet-stream:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingDownloadInvestorOnboardingFileStatusResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingErrorResponse'
+  /investorOnboarding/imageStatus:
+    get:
+      summary: Get investor onboarding image status
+      operationId: getInvestorOnboardingImageStatus
+      tags: [Investor Onboarding]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingGetInvestorOnboardingImageStatusResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingErrorResponse'
+  /investorOnboarding/investorStatus:
+    get:
+      summary: Get investor status grid details
+      operationId: getInvestorStatus
+      tags: [Investor Onboarding]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingGetInvestorStatusResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingErrorResponse'
+  /investorOnboarding/investorStatus/{transactionReferenceId}/download:
+    get:
+      summary: Download investor status details
+      operationId: downloadInvestorStatus
+      tags: [Investor Onboarding]
+      parameters:
+        - name: transactionReferenceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/octet-stream:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingDownloadInvestorStatusResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingErrorResponse'
+  /investorOnboarding/investorStatus/remediate/{transactionReferenceId}:
+    get:
+      summary: Get remediation details
+      operationId: getInvestorRemediation
+      tags: [Investor Onboarding]
+      parameters:
+        - name: transactionReferenceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingGetInvestorRemediationResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingErrorResponse'
+    patch:
+      summary: Update remediation details
+      operationId: updateInvestorRemediation
+      tags: [Investor Onboarding]
+      parameters:
+        - name: transactionReferenceId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvestorOnboardingUpdateInvestorRemediationRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingUpdateInvestorRemediationResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingErrorResponse'
+    post:
+      summary: Upload remediation document
+      operationId: uploadInvestorRemediation
+      tags: [Investor Onboarding]
+      parameters:
+        - name: transactionReferenceId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/InvestorOnboardingUploadInvestorRemediationRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingUploadInvestorRemediationResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingErrorResponse'
+  /investorOnboarding/authorize:
+    get:
+      summary: Get authorization details for transaction
+      operationId: getInvestorOnboardingAuthorize
+      tags: [Investor Onboarding]
+      parameters:
+        - name: transactionReference
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingGetInvestorOnboardingAuthorizeResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingErrorResponse'
+  /investorOnboarding/authorize/sectionView:
+    get:
+      summary: Get section view details for authorization
+      operationId: getAuthorizeSectionView
+      tags: [Investor Onboarding]
+      parameters:
+        - name: transactionReference
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingGetAuthorizeSectionViewResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingErrorResponse'
+  /investorOnboarding/authorize/aof:
+    get:
+      summary: Get AOF image details
+      operationId: getAuthorizeAOF
+      tags: [Investor Onboarding]
+      parameters:
+        - name: transactionReference
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingGetAuthorizeAOFResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingErrorResponse'
+  /investorOnboarding/authorize/pan:
+    get:
+      summary: Get PAN image details
+      operationId: getAuthorizePAN
+      tags: [Investor Onboarding]
+      parameters:
+        - name: transactionReference
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingGetAuthorizePANResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingErrorResponse'
+  /investorOnboarding/authorize/requiredDocuments:
+    get:
+      summary: Get list of required documents
+      operationId: getAuthorizeRequiredDocuments
+      tags: [Investor Onboarding]
+      parameters:
+        - name: transactionReference
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingGetAuthorizeRequiredDocumentsResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingErrorResponse'
+  /investorOnboarding/authorize/investorDetails:
+    get:
+      summary: Get investor details
+      operationId: getAuthorizeInvestorDetails
+      tags: [Investor Onboarding]
+      parameters:
+        - name: transactionReference
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingGetAuthorizeInvestorDetailsResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingErrorResponse'
+  /investorOnboarding/authorize/investorSignature:
+    get:
+      summary: Get investor signature
+      operationId: getAuthorizeInvestorSignature
+      tags: [Investor Onboarding]
+      parameters:
+        - name: transactionReference
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingGetAuthorizeInvestorSignatureResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingErrorResponse'
+  /investorOnboarding/authorize/hold/reject:
+    patch:
+      summary: Reject authorization
+      operationId: rejectInvestorOnboardingAuthorize
+      tags: [Investor Onboarding]
+      parameters:
+        - name: transactionReference
+          in: query
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvestorOnboardingRejectInvestorOnboardingAuthorizeRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingRejectInvestorOnboardingAuthorizeResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingErrorResponse'
+  /investorOnboarding/authorize/hold/sendToRemediate:
+    patch:
+      summary: Send authorization to remediation
+      operationId: sendToRemediateInvestorOnboardingAuthorize
+      tags: [Investor Onboarding]
+      parameters:
+        - name: transactionReference
+          in: query
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvestorOnboardingSendToRemediateInvestorOnboardingAuthorizeRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingSendToRemediateInvestorOnboardingAuthorizeResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingErrorResponse'
+  /investorOnboarding/authorize/submit:
+    post:
+      summary: Submit authorization
+      operationId: submitInvestorOnboardingAuthorize
+      tags: [Investor Onboarding]
+      parameters:
+        - name: transactionReference
+          in: query
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvestorOnboardingSubmitInvestorOnboardingAuthorizeRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingSubmitInvestorOnboardingAuthorizeResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorOnboardingErrorResponse'

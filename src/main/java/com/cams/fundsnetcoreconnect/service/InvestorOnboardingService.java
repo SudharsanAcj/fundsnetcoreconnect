@@ -1,0 +1,28 @@
+package com.cams.fundsnetcoreconnect.service;
+
+import com.cams.fundsnetcoreconnect.api.model.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.time.LocalDate;
+
+public interface InvestorOnboardingService {
+    InvestorOnboardingDownloadInvestorOnboardingFileStatusResponse downloadInvestorOnboardingFileStatus(String fileReferenceId);
+    InvestorOnboardingDownloadInvestorStatusResponse downloadInvestorStatus(String transactionReferenceId);
+    InvestorOnboardingGetAuthorizeAOFResponse getAuthorizeAOF(String transactionReference);
+    InvestorOnboardingGetAuthorizeInvestorDetailsResponse getAuthorizeInvestorDetails(String transactionReference);
+    InvestorOnboardingGetAuthorizeInvestorSignatureResponse getAuthorizeInvestorSignature(String transactionReference);
+    InvestorOnboardingGetAuthorizePANResponse getAuthorizePAN(String transactionReference);
+    InvestorOnboardingGetAuthorizeRequiredDocumentsResponse getAuthorizeRequiredDocuments(String transactionReference);
+    InvestorOnboardingGetAuthorizeSectionViewResponse getAuthorizeSectionView(String transactionReference);
+    InvestorOnboardingGetInvestorOnboardingAuthorizeResponse getInvestorOnboardingAuthorize(String transactionReference);
+    InvestorOnboardingGetInvestorOnboardingFileStatusResponse getInvestorOnboardingFileStatus(Integer page, Integer limit, LocalDate startDate, LocalDate endDate);
+    InvestorOnboardingGetInvestorOnboardingImageStatusResponse getInvestorOnboardingImageStatus(Integer page, Integer limit);
+    InvestorOnboardingGetInvestorOnboardingSummaryResponse getInvestorOnboardingSummary(LocalDate startDate, LocalDate endDate);
+    InvestorOnboardingGetInvestorRemediationResponse getInvestorRemediation(String transactionReferenceId);
+    InvestorOnboardingGetInvestorStatusResponse getInvestorStatus(Integer page, Integer limit, LocalDate startDate, LocalDate endDate);
+    InvestorOnboardingRejectInvestorOnboardingAuthorizeResponse rejectInvestorOnboardingAuthorize(String transactionReference);
+    InvestorOnboardingSendToRemediateInvestorOnboardingAuthorizeResponse sendToRemediateInvestorOnboardingAuthorize(String transactionReference);
+    InvestorOnboardingSubmitInvestorOnboardingAuthorizeResponse submitInvestorOnboardingAuthorize(String transactionReference, InvestorOnboardingSubmitInvestorOnboardingAuthorizeRequest request);
+    InvestorOnboardingUpdateInvestorRemediationResponse updateInvestorRemediation(String transactionReferenceId, InvestorOnboardingUpdateInvestorRemediationRequest request);
+    InvestorOnboardingUploadInvestorRemediationResponse uploadInvestorRemediation(String transactionReferenceId, String documentType, MultipartFile file);
+}
